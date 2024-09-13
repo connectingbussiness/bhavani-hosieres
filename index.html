@@ -33,7 +33,7 @@
             <table class="table table-bordered table-hover" id="quotationTable">
                 <thead>
                     <tr>
-                        <th>#</th> <!-- Serial Number -->
+                        <th>S.No</th> <!-- Serial Number -->
                         <th>Price</th>
                         <th>Quantity</th>
                         <th>Item Total</th>
@@ -42,7 +42,7 @@
                 </thead>
                 <tbody id="itemsList">
                     <tr>
-                        <td>1</td> <!-- Serial Number starts from 1 -->
+                        <td>1</td> <!-- S.No starts from 1 -->
                         <td><input type="number" class="form-control price" placeholder="Price" oninput="calculateTotal()"></td>
                         <td><input type="number" class="form-control quantity" placeholder="Quantity" oninput="calculateTotal()"></td>
                         <td class="item-total">0</td>
@@ -67,4 +67,110 @@
     <script>
         // Set the timestamp to current date and time
         function setTimestamp() {
-           
+            const now = new Date();
+            const formattedDate = now.toLocaleString();
+            document.getElementById('timestamp').textContent = formattedDate;
+        }
+
+        // Adds a new item row
+        function addItem() {
+            const rowCount = document.getElementById('itemsList').rows.length;
+            const row = `
+                <tr>
+                    <td>${rowCount + 1}</td> <!-- Increment S.No -->
+                    <td><input type="number" class="form-control price" placeholder="Price" oninput="calculateTotal()"></td>
+                    <td><input type="number" class="form-control quantity" placeholder="Quantity" oninput="calculateTotal()"></td>
+                    <td class="item-total">0</td>
+                    <td><button class="btn btn-danger" onclick="removeItem(this)">Remove</button></td>
+                </tr>
+            `;
+            document.getElementById('itemsList').insertAdjacentHTML('beforeend', row);
+
+            // Scroll to the bottom and focus on the new item
+            scrollToBottom();
+        }
+
+        // Removes an item row and updates serial numbers
+        function removeItem(button) {
+            const row = button.closest('tr');
+            row.remove();
+            calculateTotal();
+            updateSerialNumbers();
+        }
+
+        // Updates the serial numbers (S.No) after an item is removed
+        function updateSerialNumbers() {
+            const rows = document.querySelectorAll('#itemsList tr');
+            rows.forEach((row, index) => {
+                row.querySelector('td:nth-child(1)').textContent = index + 1;
+            });
+        }
+
+        // Calculates total for all items and updates the whole total
+        function calculateTotal() {
+            let wholeTotal = 0;
+            document.querySelectorAll('#itemsList tr').forEach((row) => {
+                const price = row.querySelector('.price').value || 0;
+                const quantity = row.querySelector('.quantity').value || 0;
+                const itemTotal = price * quantity;
+                row.querySelector('.item-total').textContent = itemTotal.toFixed(2);
+                wholeTotal += itemTotal;
+            });
+            document.getElementById('wholeTotal').textContent = wholeTotal.toFixed(2);
+        }
+
+        // Handles the Enter key to add items
+        document.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                const activeElement = document.activeElement;
+                if (activeElement.classList.contains('price') || activeElement.classList.contains('quantity')) {
+                    addItem();
+                }
+            }
+        });
+
+        // Scroll to the bottom after adding a new row
+        function scrollToBottom() {
+            document.querySelector('.table-responsive').scrollTop = document.querySelector('.table-responsive').scrollHeight;
+        }
+
+        // Generates and downloads PDF
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            let customerName = document.getElementById('customerName').value || 'N/A';
+            let wholeTotal = document.getElementById('wholeTotal').textContent;
+            let timestamp = document.getElementById('timestamp').textContent;
+
+            doc.text(20, 20, 'Business Quotation');
+            doc.text(20, 30, 'Customer Name: ' + customerName);
+            doc.text(20, 40, 'Date & Time: ' + timestamp);
+
+            let finalY = 50;
+            doc.autoTable({
+                head: [['S.No', 'Price', 'Quantity', 'Item Total']],
+                body: Array.from(document.querySelectorAll('#itemsList tr')).map((row, index) => {
+                    return [
+                        index + 1,  // Serial number
+                        row.querySelector('td:nth-child(2) input').value || '',
+                        row.querySelector('td:nth-child(3) input').value || '',
+                        row.querySelector('.item-total').textContent || '0'
+                    ];
+                }),
+                startY: finalY
+            });
+
+            finalY += 20;
+            doc.text(20, finalY + 10, 'Total: $' + wholeTotal);
+
+            doc.save('quotation.pdf');
+        }
+
+        // Set timestamp on page load
+        window.onload = setTimestamp;
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
