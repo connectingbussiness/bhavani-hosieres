@@ -7,7 +7,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        /* Add padding so the content is not hidden by the fixed numpad */
         .table-responsive {
             overflow-x: auto;
         }
@@ -72,7 +71,7 @@
             document.getElementById('timestamp').textContent = formattedDate;
         }
 
-        // Adds a new item row
+        // Adds a new item row and focuses on the newly added row's Price input
         function addItem() {
             const rowCount = document.getElementById('itemsList').rows.length;
             const row = `
@@ -86,8 +85,16 @@
             `;
             document.getElementById('itemsList').insertAdjacentHTML('beforeend', row);
 
-            // Scroll to the bottom and focus on the new item
+            // Scroll to the bottom and focus on the new item price input field
             scrollToBottom();
+            focusNewItem();
+        }
+
+        // Focus on the newly added item's price input field
+        function focusNewItem() {
+            const rows = document.querySelectorAll('#itemsList tr');
+            const lastRow = rows[rows.length - 1];
+            lastRow.querySelector('.price').focus();
         }
 
         // Removes an item row and updates serial numbers
