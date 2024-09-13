@@ -85,8 +85,7 @@
             `;
             document.getElementById('itemsList').insertAdjacentHTML('beforeend', row);
 
-            // Scroll to the bottom and focus on the new item price input field
-            scrollToBottom();
+            // Focus on the newly added item's price input field
             focusNewItem();
         }
 
@@ -131,15 +130,11 @@
             if (event.key === 'Enter') {
                 const activeElement = document.activeElement;
                 if (activeElement.classList.contains('price') || activeElement.classList.contains('quantity')) {
-                    addItem();
+                    event.preventDefault(); // Prevent form submission or default behavior
+                    addItem(); // Add item
                 }
             }
         });
-
-        // Scroll to the bottom after adding a new row
-        function scrollToBottom() {
-            document.querySelector('.table-responsive').scrollTop = document.querySelector('.table-responsive').scrollHeight;
-        }
 
         // Generates and downloads PDF
         function downloadPDF() {
