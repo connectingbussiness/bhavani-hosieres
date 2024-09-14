@@ -60,6 +60,9 @@
 
         <!-- Download PDF Button -->
         <button class="btn btn-primary" onclick="downloadPDF()">Download PDF</button>
+        
+        <!-- New Bill Button -->
+        <button class="btn btn-warning" onclick="newBill()">New Bill</button> <!-- New Bill Button -->
     </div>
 
     <!-- JavaScript -->
@@ -135,6 +138,11 @@
                 }
             }
         });
+
+        // Refresh the page to generate a new bill
+        function newBill() {
+            location.reload();  // Refreshes the entire page to reset the form
+        }
 
         // Generates and downloads PDF
         function downloadPDF() {
